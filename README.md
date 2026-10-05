@@ -1,5 +1,8 @@
 # Flowrow
 
+A Tcl/Tk 9 module for creating and managing toolbars that automatically
+adapts to the application’s width.
+
 The `flowrow::Row` class is used to manage flowrow (`ttk::frame` widgets)
 which themselves contain widgets (often ``ttk::button``s; but labels,
 entries, and spinboxes all work too).
@@ -7,7 +10,9 @@ entries, and spinboxes all work too).
 See `flowrow_test.tk` for an example of use. If the scale is too small,
 pass a scale argument, e.g., `flowrow_test.tk 1.5`. It is also possible to
 pass a theme argument, e.g., `flowrow_test.tk 1.5 classic` (the order of
-arguments doesn’t matter).
+arguments doesn’t matter). See also
+[Wishlists](https://github.com/mark-summerfield/wishlist) a GUI book
+wishlist manager which uses flowrow.
 
 | ![Screenshot1](screenshot1.png) |
 |:--:|
