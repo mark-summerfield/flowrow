@@ -1,0 +1,176 @@
+#!/usr/bin/env wish9
+# Copyright © 2026 Mark Summerfield. All rights reserved.
+
+if {![catch {file readlink [info script]} name]} {
+    const APPPATH [file dirname $name]
+} else {
+    const APPPATH [file normalize [file dirname [info script]]]
+}
+tcl::tm::path add $APPPATH
+
+package require flowrow
+
+proc main {} {
+    set debug 0
+    set theme [lrandom [ttk::style theme names]]
+    foreach arg $::argv {
+        if {[string is double -strict $arg]} {
+            tk scaling $arg
+        } elseif {$arg eq "debug"} {
+            set debug 1
+            puts [ttk::style theme names]
+        } else {
+            set theme $arg
+        }
+    }
+    [App new $theme $debug] show
+}
+
+oo::singleton create App {
+    variable Count
+    variable Debug
+    variable Toolbars
+}
+
+oo::define App constructor {theme debug} {
+    set Count 0
+    set Debug $debug
+    wm withdraw .
+    option add *tearOff 0
+    ttk::style theme use $theme
+    tk appname "Flowrow Test ($theme)"
+    my make_ui
+    my initialize_toolbars
+}
+
+oo::define App method show {} {
+    wm deiconify .
+    raise .
+}
+
+oo::define App method make_ui {} {
+    my prepare_ui
+    ttk::frame .mf ;# main frame
+    my make_toolbar
+    my make_widgets
+    my make_layout
+    my make_menu
+    my make_bindings
+}
+
+oo::define App method initialize_toolbars {} {
+    # Imagine reading back saved toolbar states so we have:
+    set toolbars [dict create .mf.tb.tb1 0 .mf.tb.tb2 1 .mf.tb.tb3 1 \
+            .mf.tb.tb4 1 .mf.tb.tb5 0 .mf.tb.tb6 1 .mf.tb.tb7 1 \
+            .mf.tb.tb8 1 .mf.tb.tb9 1 .mf.tb.tb10 0]
+    # Test with _all_ hidden.
+    #set toolbars [dict create .mf.tb.tb1 0 .mf.tb.tb2 0 .mf.tb.tb3 0 \
+    #        .mf.tb.tb4 0 .mf.tb.tb5 0 .mf.tb.tb6 0 .mf.tb.tb7 0 \
+    #        .mf.tb.tb8 0 .mf.tb.tb9 0 .mf.tb.tb10 0]
+    set hidden [list]
+    dict for {toolbar show} $toolbars {
+        if {!$show} { lappend hidden $toolbar }
+    }
+    $Toolbars hide_toolbars {*}$hidden
+}
+
+oo::define App method prepare_ui {} {
+    wm title . [tk appname]
+    wm iconname . [tk appname]
+    wm minsize . 240 160
+    set ::MENU_ICON_SIZE [expr {max(20, round(14 * [tk scaling]))}]
+}
+
+oo::define App method make_toolbar {} {
+    set Toolbars [flowrow::Row new .mf.tb]
+    ttk::frame .mf.tb.tb1
+    ttk::button .mf.tb.tb1.a -text A -takefocus 0 -style Toolbutton
+    ttk::button .mf.tb.tb1.b -text B -takefocus 0 -style Toolbutton
+    ttk::button .mf.tb.tb1.c -text C -takefocus 0 -style Toolbutton
+    ttk::button .mf.tb.tb1.d -text D -takefocus 0 -style Toolbutton
+    $Toolbars add_toolbar .mf.tb.tb1
+    ttk::frame .mf.tb.tb2
+    ttk::button .mf.tb.tb2.e -text E -takefocus 0 -style Toolbutton
+    ttk::button .mf.tb.tb2.f -text F -takefocus 0 -style Toolbutton
+    $Toolbars add_toolbar .mf.tb.tb2
+    ttk::frame .mf.tb.tb3
+    ttk::button .mf.tb.tb3.g -text G -takefocus 0 -style Toolbutton
+    ttk::button .mf.tb.tb3.h -text H -takefocus 0 -style Toolbutton
+    ttk::button .mf.tb.tb3.i -text I -takefocus 0 -style Toolbutton
+    $Toolbars add_toolbar .mf.tb.tb3
+    ttk::frame .mf.tb.tb4
+    ttk::button .mf.tb.tb4.j -text J -takefocus 0 -style Toolbutton
+    ttk::button .mf.tb.tb4.k -text K -takefocus 0 -style Toolbutton
+    ttk::button .mf.tb.tb4.l -text L -takefocus 0 -style Toolbutton
+    ttk::button .mf.tb.tb4.m -text M -takefocus 0 -style Toolbutton
+    ttk::button .mf.tb.tb4.n -text N -takefocus 0 -style Toolbutton
+    $Toolbars add_toolbar .mf.tb.tb4
+    ttk::frame .mf.tb.tb5
+    ttk::button .mf.tb.tb5.o -text O -takefocus 0 -style Toolbutton
+    $Toolbars add_toolbar .mf.tb.tb5
+    ttk::frame .mf.tb.tb6
+    ttk::button .mf.tb.tb6.p -text P -takefocus 0 -style Toolbutton
+    ttk::button .mf.tb.tb6.q -text Q -takefocus 0 -style Toolbutton
+    ttk::button .mf.tb.tb6.r -text R -takefocus 0 -style Toolbutton
+    $Toolbars add_toolbar .mf.tb.tb6
+    ttk::frame .mf.tb.tb7
+    ttk::button .mf.tb.tb7.s -text S -takefocus 0 -style Toolbutton
+    ttk::button .mf.tb.tb7.t -text T -takefocus 0 -style Toolbutton
+    $Toolbars add_toolbar .mf.tb.tb7
+    ttk::frame .mf.tb.tb8
+    ttk::button .mf.tb.tb8.u -text U -takefocus 0 -style Toolbutton
+    ttk::button .mf.tb.tb8.v -text V -takefocus 0 -style Toolbutton
+    ttk::button .mf.tb.tb8.w -text W -takefocus 0 -style Toolbutton
+    ttk::button .mf.tb.tb8.x -text X -takefocus 0 -style Toolbutton
+    $Toolbars add_toolbar .mf.tb.tb8
+    ttk::frame .mf.tb.tb9
+    ttk::button .mf.tb.tb9.y -text Y -takefocus 0 -style Toolbutton
+    ttk::button .mf.tb.tb9.z -text Z -takefocus 0 -style Toolbutton
+    $Toolbars add_toolbar .mf.tb.tb9
+    ttk::frame .mf.tb.tb10
+    ttk::label .mf.tb.tb10.ab -text Size -takefocus 0 -style Toolbutton
+    ttk::spinbox .mf.tb.tb10.ac -format %.0f -from 0 -to 100 -width 3
+    .mf.tb.tb10.ac set 100
+    $Toolbars add_toolbar .mf.tb.tb10
+}
+
+oo::define App method make_widgets {} {
+    text .mf.text
+    ttk::label .mf.label -text Ready -relief sunken
+}
+
+oo::define App method make_layout {} {
+    set opts "-padx 3 -pady 3"
+    grid .mf.tb -row 0 -column 0 -sticky we {*}$opts
+    grid .mf.text -row 1 -column 0 -sticky news {*}$opts
+    grid .mf.label -row 2 -column 0 -sticky we {*}$opts
+    grid rowconfigure .mf 1 -weight 1
+    grid columnconfigure .mf 0 -weight 1
+    pack .mf -fill both -expand 1
+}
+
+oo::define App method make_menu {} {
+    menu .menu
+    . configure -menu .menu
+    menu .menu.file
+    .menu add cascade -menu .menu.file -label File -underline 0
+    .menu.file add command -command [callback on_quit] -label "⏼ Quit" \
+            -underline 2 -accelerator Ctrl+Q
+    $Toolbars new_menu .menu {File Edit Style Chapter Section Category \
+            Group Item Window Size}
+}
+
+oo::define App method make_bindings {} {
+    bind . <Escape> [callback on_quit]
+    bind . <Control-q> [callback on_quit]
+    wm protocol . WM_DELETE_WINDOW [callback on_quit]
+}
+
+oo::define App method on_quit {} {
+    puts "Save toolbar states: [$Toolbars toolbars]"
+    exit
+}
+
+proc lrandom lst { lindex $lst [expr {int(rand() * [llength $lst])}] }
+
+main

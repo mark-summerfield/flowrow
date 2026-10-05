@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flowrow Module</title>
+</head>
+<body>
+
+<h1>Flowrow Module</h1>
+
+<div style="margin: 0.2em; padding: 0.1em; float: right;">
+<img src="screenshot1.png" alt="Flowrow" />
+</div>
+
+<p>
+The Flowrow module <code>flowrow-1.tm</code> is a self-contained pure
+Tcl/Tk&nbsp;9 module that provides a class for creating a frame for
+holding one or more toolbars. A toolbar being a <code>ttk::frame</code>
+holding one or more widgets. The most common widgets used are
+<code>ttk::button</code>s, but entries, labels, and spinboxes work fine
+too.
+</p>
+
+<p>
+It has no dependencies. The usefulnes of a flowrow is that when the
+window containing it is resized the flowrow will relayout the toolbars
+it contains so that they fit within the window’s width. It does this by
+laying them out in as many rows as necessary.
+</p>
+
+<h2 id="api">API</h2>
+
+<p>
+The <code>flowrow</code> module (and namespace of the same name) provides
+one public function; the <a href="#new"><code>flowrow::Row</code>
+new</a> constructor. The returned <code>flowrow::Row</code> object provides
+methods for adding, hiding, showing, and removing toolbars. The
+<code>flowrow::Row</code> object’s <code>ttk::frame</code> <i>must</i>
+be laid out in its parent using the <code>grid</code> command.
+</p>
+
+<p>
+The <code>flowrow::Row</code> will automatically relayout the toolbars it
+contains when toolbars are added, hidden, shown, or removed. It can also
+provide a <a href="#new_menu"><i>Toolbars</i> menu</a>. The menu’s first
+item allows the end-user to show or hide all the toolbars; the other
+items control each toolbar individually.
+</p>
+
+<h3 id="new"><code>flowrow::Row new <i>name</i></code></h3>
+
+<p>
+The <code><i>name</i></code> is the name of the window (a
+<code>ttk::frame</code>) to create. For example, if the application’s
+main window is <code>.mainwindow</code>, the <code><i>name</i></code>
+might be <code>.mainwindow.toolbar</code>.
+</p>
+
+<p>
+For the <code>flowrow::Row</code> methods shown below we will assume that
+the <code>flowrow::Row</code> object is held in a variable called
+<code>$Flowrow</code>.
+</p>
+
+<h4><code>$Flowrow frame</code></h4>
+
+<p>
+This method returns the <code>flowrow::Row</code>’s
+<code>ttk::frame</code>. It is needed to provide the frame which
+<i>must</i> then be gridded inside the main window.
+</p>
+
+<h4 id="toolbars"><code>$Flowrow toolbars</code></h4>
+
+<p>
+This method returns a <code>dict</code>, the keys of which are the
+toolbars (<code>ttk::frame</code>’s) managed by the
+<code>flowrow::Row</code>, and whose values are <code>0</code> (false;
+hide) or <code>1</code> (true; show; the default).
+</p>
+
+<p>
+This method is ideal for saving the state of an application’s toolbars.
+</p>
+
+<h4 id="refresh"><code>$Flowrow refresh</code></h4>
+
+<p>
+This method forces the <code>flowrow::Row</code> to relayout its
+toolbars. It should <i>not</i> be needed by external code.
+</p>
+
+<h4 id="add_toolbar"><code>$Flowrow add_toolbar <i>toolbar</i></code></h4>
+
+<p>
+This method adds the given <code><i>toolbar</i></code> (normally a
+<code>ttk::frame</code>) to those managed by the
+<code>flowrow::Row</code> and then calls <a
+href="#refresh"><code>flowrow::Row refresh</code></a>. Note that
+<code>flowrow::Row</code> will layout the <code><i>toolbar</i></code>’s
+child widgets so this method should be called <i>after</i> the
+<code><i>toolbar</i></code> <i>and</i> its child widgets have been
+created. (See <code>flowrow_test.tk</code>’s <code>make_toolbar</code>
+method for an example.)
+</p>
+
+<h4 id="show_toolbar"><code>$Flowrow show_toolbar <i>toolbar</i> {<i>show</i> 1}</code></h4>
+
+<p>
+This method is used to programmatically hide or show the given
+<code><i>toolbar</i></code>. It is rarely needed since the end-user can
+hide and show toolbars using the <a href="#new_menu"><i>Toolbars</i>
+menu</a>.
+</p>
+
+<h4><code>$Flowrow hide_toolbars <i>args</i></code></h4>
+
+<p>
+This method is used to programmatically hide all the given toolbars. If
+the application’s toolbars state has been saved, it can be restored by
+calling this method. For example:
+</p>
+
+<pre><code>
+# Assume that toolbars is a dict with toolbar keys and 0 (hide) or 1 (show)
+# values (i.e., as returned by the <a
+href="#toolbars"><code>flowrow::Row toolbars</code></a> method.
+set hidden [list]
+dict for {toolbar show} $toolbars {
+    if {!$show} { lappend hidden $toolbar }
+}
+$Flowrow hide_toolbars {*}$hidden
+</code></pre>
+
+<h4><code>$Flowrow remove_toolbar <i>toolbar</i></code></h4>
+
+<p>
+This method stops the given <code><i>toolbar</i></code> from being
+managed by the <code>flowrow::Row</code>. Normally, toolbars are hidden
+using the <a href="#show_toolbar"><code>flowrow::Row
+show_toolbar</code></a> method with a second argument of <code>0</code>
+(false; don’t show).
+</p>
+
+<h4><code>$Flowrow show {<i>show</i> 1}</code></h4>
+
+<p>
+This method is used to programmatically hide or show all the toolbars.
+It is rarely needed since the end-user can hide and show all the
+toolbars (or individual toolbars) using the <a
+href="#new_menu"><i>Toolbars</i> menu</a>.
+</p>
+
+<h4 id="new_menu"><code>$Flowrow new_menu <i>parent_menu</i>
+<i>names</i></code></h4>
+
+<p>
+This method should be called only after <i>all</i> the toolbars have
+been added using the <a href="#add_toolbar"><code>flowrow::Row
+add_toolbar</code></a> method.
+</p>
+
+<p>
+This method adds a new <i>Toolbars</i> menu as a cascade (submenu) of
+the given <code><i>parent_menu</i></code>. The <code><i>names</i></code>
+must be a <code>list</code> of names corresponding to the toolbars that
+were added (in the same order that they were added). For example:
+</p>
+
+<pre><code>
+menu .menu
+. configure -menu .menu
+menu .menu.file
+.menu add cascade -menu .menu.file -label File -underline 0
+# Other File menu options…
+.menu.file add command -command [callback on_quit] -label Quit -underline 0 -accelerator Ctrl+Q
+# Any other menus that precede the Toolbars menu…
+$Flowrow new_menu .menu {File Edit Style Item Window} ;# creates a .menu._flowrow menu
+# Any other menus that follow the Toolbars menu…
+</code></pre>
+
+<hr>
+</body>
+</html>
