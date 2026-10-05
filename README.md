@@ -26,6 +26,9 @@ wishlist manager which uses flowrow.
 |:--:|
 | *`wishlists.tk` showing the Toolbar & Toolbar menu produced by flowrow* |
 
+Note: I use [Store](https://github.com/mark-summerfield/store) for version
+control so github is only used to make the code public.
+
 ## Installing
 
 The module is entirely self-contained. To use `flowrow-1.tm` either put it
