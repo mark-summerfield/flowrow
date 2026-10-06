@@ -24,7 +24,12 @@ wishlist manager which uses flowrow.
 
 | ![Screenshot1](screenshot3.png) |
 |:--:|
-| *`wishlists.tk` showing the Toolbar & Toolbar menu produced by flowrow* |
+| * [Wishlists](https://github.com/mark-summerfield/wishlist) showing the Toolbar produced by flowrow* |
+
+| ![Screenshot1](screenshot4.png) |
+| ![Screenshot1](screenshot5.png) |
+|:--:|
+| * [Styled Text Editor](https://github.com/mark-summerfield/ste) showing the Toolbar by flowrow* |
 
 Note: I use [Store](https://github.com/mark-summerfield/store) for version
 control so github is only used to make the code public.
